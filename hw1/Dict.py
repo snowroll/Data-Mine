@@ -102,23 +102,6 @@ def count_matrix(matrix, T_I):  #复杂度太高，最外循环 文本 ， 加 �
                 matrix[row][col] = str(counter)
     return matrix
 
-
-
-
-    # for row in range(1, len(matrix)):
-    #     for col in range(1, len(matrix)):
-    #         if matrix[0][row] == matrix[col][0]:
-    #             matrix[col][row] = str(0)  
-    #         else:
-    #             counter = 0
-    #             for i in range(0, N):
-    #                 if T_I[matrix[0][row], i] != 0 and T_I[matrix[col][0], i] != 0:
-    #                     counter += 1
-    #                 else:
-    #                     continue
-    #             matrix[col][row] = str(counter)
-    # return matrix
-
 def sort_print(Order, flag, tag):  #欧式距离 flag = 0 余弦 flag = 1
     _Sort = zip(Order.values(), Order.keys())
     if flag == 1:
