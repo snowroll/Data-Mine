@@ -50,6 +50,8 @@ my.dataframe <- data.frame("title" = character(),  "year" = character(), "month"
 word_set <- list()
 text_vector <- c()
 full.text <- c()
+attr.list <- c()
+month.list <- c()
 
 for(i in 1:file_num){
   if(i == 30)
@@ -100,12 +102,14 @@ for(i in 1:file_num){
       }
     }
   }
+  attr.list <- c(attr.list, AttrVector)
   AttrVector = paste(AttrVector, collapse = " ")
   
   year_node = getNodeSet(doc, "//meta[@name='publication_year']")  #find year node
   year = sapply(year_node, xmlGetAttr, "content")  #get the real year
   month_node = getNodeSet(doc, "//meta[@name='publication_month']")
   month = sapply(month_node, xmlGetAttr, "content")
+  month.list <- c(month.list, month)
   day_node = getNodeSet(doc, "//meta[@name='publication_day_of_month']")
   day = sapply(day_node, xmlGetAttr, "content")
   my.dataframe <- rbind(my.dataframe, data.frame( year, month, day, AttrVector, stem_news))  #first question
@@ -126,10 +130,22 @@ for(i in 1 : 30){
   bag_of_word <- c(bag_of_word, list(vector_num))
 }
 
+list <- c()
+for(i in 1 : length(unlist_set)){
+  list <- c(list, nchar(unlist_set[i]))
+}
+#data <- data.frame(list)
+
+attr.list <- as.data.frame(table(attr.list))
+monthdata.list <- as.data.frame(table(month.list))
+print(monthdata.list)
+dataframe_month <- data.frame(month.list)
+ggplot(dataframe_month, aes(x = month.list)) + geom_bar()  #ggplot(data.frame, aes(x = list)) + geom_bar
+
+
 freq_word <- unlist(bag_of_word[1])
 freq.key <- list()
 freq.dataframe <- data.frame("word" = character(), "freq" = character())
-
 
 for(i in 2 : 30)   #get word cloud
   freq_word <- c(freq_word) + c(unlist(bag_of_word[i]))
@@ -140,7 +156,7 @@ for(i in 1 : 100){
 }
 keyword <- paste(keyword, collapse = " ")
 print(keyword)
-wordcloud(full.text, max.word = 100, random.order=FALSE)
+#wordcloud(full.text, max.word = 100, random.order=FALSE)
 
 
 
