@@ -2,7 +2,7 @@
 library("XML")
 library("methods")
 library("tm")
-library("qdap")  #stem
+#library("qdap")  #stem
 library("parallel")
 library("SnowballC")
 
@@ -34,10 +34,10 @@ stem_text <- function(text, language = "porter", mc.cores = 1){  #stem word func
 file = list.files("./samples_500/")
 file_num = length(file)
 my.dataframe <- data.frame("title" = character(),  "year" = character(), "month" = character(), "day" = character(), "Attr"=character(), "full_text"=character())
-
+word_set <- list()
 
 for(i in 1:file_num){
-  if(i == 2)
+  if(i == 6)
     break
   doc_name = paste("./samples_500/", file[i], sep = "")
   doc <- xmlParse(doc_name)  #loading xml file
@@ -65,7 +65,9 @@ for(i in 1:file_num){
   text_vector = gsub("\\s+", " ", text_vector)  #remove more space 
   stem_news = stem_text(text_vector, language = 'en')  #stem the news
 
-  #text_word <- strsplit(text_vector, split=" ")  #split word  
+  word <- strsplit(stem_news, split=" ")  #split word  
+  unlist_word <- unlist(word)
+  word_set <- c(word_set, list(unlist_word))
   
   title_node = getNodeSet(doc, "//title")  #get title 
   title = toString.XMLNode(title_node[[1]])
@@ -92,6 +94,21 @@ for(i in 1:file_num){
   day_node = getNodeSet(doc, "//meta[@name='publication_day_of_month']")
   day = sapply(day_node, xmlGetAttr, "content")
   
-  my.dataframe <- rbind(my.dataframe, data.frame( year, month, day, AttrVector, stem_news))
+  my.dataframe <- rbind(my.dataframe, data.frame( year, month, day, AttrVector, stem_news))  #first question
 }
-#print(my.dataframe)
+
+unlist_set <- unlist(word_set)  #bulid Bag Of Word Vector
+unique_word_set <- unique(unlist_set)  #Duplicate removal
+bag_of_word <- list()
+for(i in 1 : 5){
+  vector_num <- c()
+  single_set <- unlist(word_set[i])  #the words of signal news
+  for(j in 1 : length(unique_word_set)){ 
+    patter <- paste("^", unique_word_set[j], "$", sep = "");  #match unique word in signal news
+    occur_num <- length(grep(patter, single_set))  #get the number of occur
+    #print(occur_num)
+    vector_num <- c(vector_num, occur_num)
+  }
+  bag_of_word <- c(bag_of_word, list(vector_num))
+}
+print(bag_of_word)
